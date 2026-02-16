@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paprika Checklist Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+      <div class="logo">
+        <img src="paprika-logo.png" alt="Paprika" class="logo-image" style="height: 32px;">
+        <div class="logo-text">
+          <p>Checklist Engine</p>
+        </div>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <span>☰</span>
+      </button>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="paprika-logo.png" alt="Paprika" class="logo-image">
+          <div class="logo-text">
+            <p>Checklist Engine</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="home.html" class="nav-item">
+          <span class="nav-item-icon">🏠</span>
+          <span class="nav-label">Home</span>
+        </a>
+        <div class="nav-item active" data-view="worker">
+          <span class="nav-item-icon">✓</span>
+          <span>My Checklists</span>
+        </div>
+        <div class="nav-item" data-view="manager">
+          <span class="nav-item-icon">📊</span>
+          <span>Manager Dashboard</span>
+        </div>
+        <div class="nav-item" data-view="oil-tracker">
+          <span class="nav-item-icon">🔥</span>
+          <span>Oil Change Tracker</span>
+        </div>
+        <div class="nav-item" data-view="events">
+          <span class="nav-item-icon">📅</span>
+          <span>Event Scheduler</span>
+        </div>
+        <div class="nav-item" data-view="notifications">
+          <span class="nav-item-icon">🔔</span>
+          <span>Notifications</span>
+        </div>
+      </nav>
+
+      <div style="padding: var(--space-lg); border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <div class="form-group">
+          <label class="form-label">Demo Role</label>
+          <select id="roleSelector" class="form-select">
+            <option value="worker">Worker - Marko Petrović</option>
+            <option value="team-leader">Team Leader - Ana Jovanović</option>
+            <option value="manager">General Manager</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <select id="locationSelector" class="form-select">
+            <option value="location-1">Location 1 - Knez Mihailova</option>
+            <option value="location-2">Location 2 - Skadarlija</option>
+            <option value="location-3">Location 3 - Zemun</option>
+            <option value="production">Production Facility</option>
+          </select>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Worker View -->
+      <div id="workerView" class="view-container">
+        <div class="card glass-card fade-in">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">My Daily Checklists</h2>
+              <p style="color: var(--gray-600); margin: 0;">Wednesday, February 12, 2026 • Shift: 08:00 - 16:00</p>
+            </div>
+            <span class="status-badge status-pending">In Progress</span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-container">
+            <div class="progress-header">
+              <span class="progress-label">Overall Completion</span>
+              <span class="progress-percentage" id="workerProgress">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="workerProgressBar" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Checklist Items -->
+          <ul class="checklist" id="workerChecklist">
+            <!-- Dynamically populated -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Manager Dashboard View -->
+      <div id="managerView" class="view-container hidden">
+        <div class="fade-in">
+          <div class="card-header"
+            style="background: transparent; border: none; padding: 0; margin-bottom: var(--space-xl);">
+            <div>
+              <h2 class="card-title">Manager Dashboard</h2>
+              <p style="color: var(--gray-600); margin: 0;">Real-time checklist compliance across all locations</p>
+            </div>
+            <div class="flex gap-md">
+              <button class="btn btn-secondary btn-sm">
+                <span>📅</span>
+                <span>Today</span>
+              </button>
+              <button class="btn btn-outline btn-sm">
+                <span>📊</span>
+                <span>Export Report</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats Overview -->
+          <div class="dashboard-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="totalChecklists">0</div>
+              <div class="stat-label">Total Checklists</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color: var(--status-green);" id="completedChecklists">0</div>
+              <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color: var(--status-yellow);" id="pendingChecklists">0</div>
+              <div class="stat-label">In Progress</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color: var(--status-red);" id="incompleteChecklists">0</div>
+              <div class="stat-label">Not Started</div>
+            </div>
+          </div>
+
+          <!-- Location Grid -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3 class="card-title">Location Overview</h3>
+            </div>
+            <div class="table-container">
+              <table id="managerTable">
+                <thead>
+                  <tr>
+                    <th>Location</th>
+                    <th>Employee</th>
+                    <th>Checklist Type</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                    <th>Last Updated</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Oil Tracker View -->
+      <div id="oilTrackerView" class="view-container hidden">
+        <div class="fade-in">
+          <div class="card-header"
+            style="background: transparent; border: none; padding: 0; margin-bottom: var(--space-xl);">
+            <div>
+              <h2 class="card-title">Oil Change Tracker</h2>
+              <p style="color: var(--gray-600); margin: 0;">Automated rotation and change history</p>
+            </div>
+            <button class="btn btn-primary">
+              <span>➕</span>
+              <span>Record Oil Change</span>
+            </button>
+          </div>
+
+          <!-- Fryer Status Grid -->
+          <div class="grid grid-3 mb-xl">
+            <div class="card">
+              <h4 style="color: var(--gray-600); font-size: var(--font-size-sm); margin-bottom: var(--space-sm);">NEXT
+                CHANGE DUE</h4>
+              <div style="font-size: var(--font-size-3xl); font-weight: 700; color: var(--paprika-red);">Feb 15</div>
+              <p style="color: var(--gray-600); margin: var(--space-sm) 0 0 0;">Saturday, 08:00</p>
+            </div>
+            <div class="card">
+              <h4 style="color: var(--gray-600); font-size: var(--font-size-sm); margin-bottom: var(--space-sm);">
+                ASSIGNED TO</h4>
+              <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--gray-900);">Marko Petrović
+              </div>
+              <p style="color: var(--gray-600); margin: var(--space-sm) 0 0 0;">Location 1 - First Shift</p>
+            </div>
+            <div class="card">
+              <h4 style="color: var(--gray-600); font-size: var(--font-size-sm); margin-bottom: var(--space-sm);">TOTAL
+                FRYERS</h4>
+              <div style="font-size: var(--font-size-3xl); font-weight: 700; color: var(--gray-900);">12</div>
+              <p style="color: var(--gray-600); margin: var(--space-sm) 0 0 0;">Across all locations</p>
+            </div>
+          </div>
+
+          <!-- Fryer Details -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3 class="card-title">Fryer Status by Location</h3>
+            </div>
+            <div id="fryerList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Scheduler View -->
+      <div id="eventsView" class="view-container hidden">
+        <div class="fade-in">
+          <div class="card-header"
+            style="background: transparent; border: none; padding: 0; margin-bottom: var(--space-xl);">
+            <div>
+              <h2 class="card-title">Event Scheduler</h2>
+              <p style="color: var(--gray-600); margin: 0;">Manage cleaning days, meetings, and inspections</p>
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <!-- Upcoming Events List -->
+            <div class="card glass-card">
+              <div class="card-header">
+                <h3 class="card-title">Upcoming Events</h3>
+              </div>
+              <div id="upcomingEvents">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- New Event Form -->
+            <div class="card glass-card">
+              <div class="card-header">
+                <h3 class="card-title">Schedule New Event</h3>
+              </div>
+              <form id="newEventForm" style="display: flex; flex-direction: column; gap: var(--space-md);">
+                <div class="form-group">
+                  <label class="form-label">Event Type</label>
+                  <select id="eventType" class="form-select" required>
+                    <option value="cleaning">General Cleaning</option>
+                    <option value="meeting">Staff Meeting</option>
+                    <option value="inspection">Inspection</option>
+                    <option value="custom">Custom Event</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Title</label>
+                  <input type="text" id="eventTitle" class="form-input" placeholder="e.g., Deep Clean Kitchen" required>
+                </div>
+                <div class="grid grid-2" style="gap: var(--space-md);">
+                  <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" id="eventDate" class="form-input" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Time</label>
+                    <input type="time" id="eventTime" class="form-input" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Location</label>
+                  <select id="eventLocation" class="form-select">
+                    <option value="all">All Locations</option>
+                    <option value="location-1">Location 1 - Knez Mihailova</option>
+                    <option value="location-2">Location 2 - Skadarlija</option>
+                    <option value="location-3">Location 3 - Zemun</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Description</label>
+                  <textarea id="eventDescription" class="form-textarea" rows="3"
+                    placeholder="Add details..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Schedule Event</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="notificationsView" class="view-container hidden">
+        <div class="fade-in">
+          <div class="card-header"
+            style="background: transparent; border: none; padding: 0; margin-bottom: var(--space-xl);">
+            <div>
+              <h2 class="card-title">Smart Notifications</h2>
+              <p style="color: var(--gray-600); margin: 0;">Automated reminders and end-of-day summaries</p>
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <!-- Recent Notifications -->
+            <div class="card glass-card">
+              <div class="card-header">
+                <h3 class="card-title">Recent Notifications</h3>
+              </div>
+              <div id="notificationsList">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="card glass-card">
+              <div class="card-header">
+                <h3 class="card-title">Notification Rules</h3>
+              </div>
+              <div
+                style="padding: var(--space-md); background: var(--gray-50); border-radius: var(--radius-md); margin-bottom: var(--space-md);">
+                <h4 style="font-size: var(--font-size-base); margin-bottom: var(--space-sm);">⏰ Shift End Reminder
+                </h4>
+                <p style="color: var(--gray-600); font-size: var(--font-size-sm); margin: 0;">Sent 1 hour before shift
+                  end to workers with incomplete checklists</p>
+              </div>
+              <div
+                style="padding: var(--space-md); background: var(--gray-50); border-radius: var(--radius-md); margin-bottom: var(--space-md);">
+                <h4 style="font-size: var(--font-size-base); margin-bottom: var(--space-sm);">📊 End-of-Day Summary
+                </h4>
+                <p style="color: var(--gray-600); font-size: var(--font-size-sm); margin: 0;">Daily report to Team
+                  Leaders and General Manager at 23:00</p>
+              </div>
+              <div
+                style="padding: var(--space-md); background: var(--gray-50); border-radius: var(--radius-md); margin-bottom: var(--space-md);">
+                <h4 style="font-size: var(--font-size-base); margin-bottom: var(--space-sm);">🔥 Oil Change Alert</h4>
+                <p style="color: var(--gray-600); font-size: var(--font-size-sm); margin: 0;">Sent to assigned worker
+                  24
+                  hours before scheduled change</p>
+              </div>
+              <div style="padding: var(--space-md); background: var(--gray-50); border-radius: var(--radius-md);">
+                <h4 style="font-size: var(--font-size-base); margin-bottom: var(--space-sm);">📅 Event Reminders</h4>
+                <p style="color: var(--gray-600); font-size: var(--font-size-sm); margin: 0;">Sent at 7, 3, and 1 day
+                  before scheduled events</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="data.js"></script>
+  <script src="worker-view.js"></script>
+  <script src="manager-dashboard.js"></script>
+  <script src="oil-tracker.js"></script>
+  <script src="event-scheduler.js"></script>
+
+  <script src="notifications.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

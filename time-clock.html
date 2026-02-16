@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Clock - Paprika Workforce</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="workforce-styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-header">
+                <img src="paprika-logo.png" alt="Paprika">
+                <div>
+                    <h1>Workforce Management</h1>
+                    <div class="header-subtitle">Time Clock</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a href="home.html" class="btn btn-secondary">🏠 Home</a>
+                <a href="employee-profile.html" class="btn btn-secondary">My Profile</a>
+                <a href="manager-approval.html" class="btn btn-secondary">Manager View</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container-sm">
+        <!-- Time Display -->
+        <div class="time-display">
+            <div class="time" id="currentTime">--:--:--</div>
+            <div class="date" id="currentDate">Loading...</div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Employee Info (shown after PIN entry) -->
+        <div id="employeeInfo" class="employee-info hidden">
+            <div class="employee-name" id="employeeName">--</div>
+            <div class="employee-role" id="employeeRole">--</div>
+        </div>
+
+        <!-- Status Indicator -->
+        <div id="statusIndicator" class="status-indicator clocked-out hidden">
+            <div class="status-dot"></div>
+            <span id="statusText">Clocked Out</span>
+        </div>
+
+        <!-- PIN Entry Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Enter Your PIN</h2>
+                <p class="card-subtitle">Enter your 4-digit personal code to clock in or out</p>
+            </div>
+
+            <form id="pinForm">
+                <div class="form-group">
+                    <input type="password" id="pinInput" class="form-input form-input-lg" maxlength="4"
+                        placeholder="••••" autocomplete="off" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <button type="button" id="clockInBtn" class="btn btn-success btn-lg" disabled>
+                        <span>🕐</span> Clock In
+                    </button>
+                    <button type="button" id="clockOutBtn" class="btn btn-primary btn-lg" disabled>
+                        <span>🕐</span> Clock Out
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quick Access Numbers -->
+        <div class="card mt-lg">
+            <div class="card-header">
+                <h3 class="card-title" style="font-size: 1rem;">Quick Access</h3>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                <button class="btn btn-secondary" onclick="addToPin('1')">1</button>
+                <button class="btn btn-secondary" onclick="addToPin('2')">2</button>
+                <button class="btn btn-secondary" onclick="addToPin('3')">3</button>
+                <button class="btn btn-secondary" onclick="addToPin('4')">4</button>
+                <button class="btn btn-secondary" onclick="addToPin('5')">5</button>
+                <button class="btn btn-secondary" onclick="addToPin('6')">6</button>
+                <button class="btn btn-secondary" onclick="addToPin('7')">7</button>
+                <button class="btn btn-secondary" onclick="addToPin('8')">8</button>
+                <button class="btn btn-secondary" onclick="addToPin('9')">9</button>
+                <button class="btn btn-secondary" onclick="clearPin()">Clear</button>
+                <button class="btn btn-secondary" onclick="addToPin('0')">0</button>
+                <button class="btn btn-secondary" onclick="backspace()">⌫</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="workforce-data.js"></script>
+    <script>
+        let currentEmployee = null;
+
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            const dateStr = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            document.getElementById('currentTime').textContent = timeStr;
+            document.getElementById('currentDate').textContent = dateStr;
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // PIN input handling
+        const pinInput = document.getElementById('pinInput');
+        const clockInBtn = document.getElementById('clockInBtn');
+        const clockOutBtn = document.getElementById('clockOutBtn');
+
+        function addToPin(digit) {
+            if (pinInput.value.length < 4) {
+                pinInput.value += digit;
+                validatePin();
+            }
+        }
+
+        function clearPin() {
+            pinInput.value = '';
+            validatePin();
+        }
+
+        function backspace() {
+            pinInput.value = pinInput.value.slice(0, -1);
+            validatePin();
+        }
+
+        pinInput.addEventListener('input', validatePin);
+
+        function validatePin() {
+            const pin = pinInput.value;
+
+            if (pin.length === 4) {
+                const employee = WORKFORCE_DATA.employees.find(e => e.pin === pin);
+
+                if (employee) {
+                    currentEmployee = employee;
+                    showEmployee(employee);
+
+                    const status = WORKFORCE_DATA.clockStatus[employee.id];
+                    clockInBtn.disabled = status.clockedIn;
+                    clockOutBtn.disabled = !status.clockedIn;
+                } else {
+                    showAlert('Invalid PIN. Please try again.', 'error');
+                    currentEmployee = null;
+                    hideEmployee();
+                    clockInBtn.disabled = true;
+                    clockOutBtn.disabled = true;
+                }
+            } else {
+                currentEmployee = null;
+                hideEmployee();
+                clockInBtn.disabled = true;
+                clockOutBtn.disabled = true;
+            }
+        }
+
+        function showEmployee(employee) {
+            document.getElementById('employeeName').textContent = employee.name;
+            document.getElementById('employeeRole').textContent = employee.role + ' • ' + employee.location;
+            document.getElementById('employeeInfo').classList.remove('hidden');
+
+            const status = WORKFORCE_DATA.clockStatus[employee.id];
+            updateStatusIndicator(status.clockedIn);
+        }
+
+        function hideEmployee() {
+            document.getElementById('employeeInfo').classList.add('hidden');
+            document.getElementById('statusIndicator').classList.add('hidden');
+        }
+
+        function updateStatusIndicator(clockedIn) {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+
+            indicator.classList.remove('hidden');
+
+            if (clockedIn) {
+                indicator.classList.remove('clocked-out');
+                indicator.classList.add('clocked-in');
+                statusText.textContent = 'Currently Clocked In';
+            } else {
+                indicator.classList.remove('clocked-in');
+                indicator.classList.add('clocked-out');
+                statusText.textContent = 'Currently Clocked Out';
+            }
+        }
+
+        // Clock In
+        clockInBtn.addEventListener('click', () => {
+            if (!currentEmployee) return;
+
+            const now = new Date();
+            const timeStr = now.toTimeString().slice(0, 5);
+
+            WORKFORCE_DATA.clockStatus[currentEmployee.id].clockedIn = true;
+            WORKFORCE_DATA.clockStatus[currentEmployee.id].lastAction = timeStr;
+
+            showAlert(`✓ Successfully clocked in at ${timeStr}`, 'success');
+            updateStatusIndicator(true);
+
+            clockInBtn.disabled = true;
+            clockOutBtn.disabled = false;
+        });
+
+        // Clock Out
+        clockOutBtn.addEventListener('click', () => {
+            if (!currentEmployee) return;
+
+            const now = new Date();
+            const timeStr = now.toTimeString().slice(0, 5);
+
+            WORKFORCE_DATA.clockStatus[currentEmployee.id].clockedIn = false;
+            WORKFORCE_DATA.clockStatus[currentEmployee.id].lastAction = timeStr;
+
+            showAlert(`✓ Successfully clocked out at ${timeStr}`, 'success');
+            updateStatusIndicator(false);
+
+            clockInBtn.disabled = false;
+            clockOutBtn.disabled = true;
+        });
+
+        // Alert system
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+        <span style="font-size: 1.25rem;">${type === 'success' ? '✓' : '⚠'}</span>
+        <span>${message}</span>
+      `;
+
+            container.innerHTML = '';
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

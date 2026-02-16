@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paprika - NYP Internal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons via CDN for premium feel -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #16a34a;
+            /* Green-600 */
+            --primary-light: #f0fdf4;
+            /* Green-50 */
+            --primary-dark: #15803d;
+            /* Green-700 */
+            --bg-body: #f9fafb;
+            /* Gray-50 */
+            --bg-surface: #ffffff;
+            --text-main: #111827;
+            /* Gray-900 */
+            --text-secondary: #4b5563;
+            /* Gray-600 */
+            --border: #e5e7eb;
+            /* Gray-200 */
+
+            /* Shift Colors */
+            --kitchen-bg: #dcfce7;
+            --kitchen-text: #166534;
+            --kitchen-border: #86efac;
+            --delivery-bg: #dbeafe;
+            --delivery-text: #1e40af;
+            --delivery-border: #93c5fd;
+            --cashier-bg: #cffafe;
+            --cashier-text: #155e75;
+            --cashier-border: #67e8f9;
+            --manager-bg: #fee2e2;
+            --manager-text: #991b1b;
+            --manager-border: #fca5a5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-content {
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .brand-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-body);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .logout-btn {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--bg-body);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .header-widget {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-home {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-home:hover {
+            color: var(--primary);
+        }
+
+        /* View Sections */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dashboard/Schedule */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .view-controls {
+            display: flex;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .view-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .view-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Calendar */
+        .calendar-container {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-body);
+        }
+
+        .calendar-day-header {
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .calendar-cell {
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            min-height: 120px;
+            padding: 0.5rem;
+            position: relative;
+        }
+
+        .calendar-cell:nth-child(7n) {
+            border-right: none;
+        }
+
+        .date-number {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .today .date-number {
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-cell {
+            background-color: #f9fafb;
+        }
+
+        /* Shifts */
+        .shift-pill {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            display: block;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .shift-pill:hover {
+            transform: scale(1.02);
+            filter: brightness(0.95);
+        }
+
+        .shift-kitchen {
+            background: var(--kitchen-bg);
+            color: var(--kitchen-text);
+            border-color: var(--kitchen-border);
+        }
+
+        .shift-delivery {
+            background: var(--delivery-bg);
+            color: var(--delivery-text);
+            border-color: var(--delivery-border);
+        }
+
+        .shift-cashier {
+            background: var(--cashier-bg);
+            color: var(--cashier-text);
+            border-color: var(--cashier-border);
+        }
+
+        .shift-manager {
+            background: var(--manager-bg);
+            color: var(--manager-text);
+            border-color: var(--manager-border);
+        }
+
+
+        /* Payroll Styles */
+        .payroll-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .payroll-summary {
+            background: linear-gradient(to right, #16a34a, #15803d);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payroll-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .payroll-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Store Info Styles */
+        .announcement-card {
+            background: white;
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .priority-high {
+            border-color: #f97316;
+            background: #fff7ed;
+        }
+
+        .priority-urgent {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        /* Complaints Styles */
+        .complaint-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .complaint-table th,
+        .complaint-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .complaint-table th {
+            background: var(--bg-body);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-open {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-resolved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* Simple Form */
+        .form-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            display: none;
+        }
+
+        .form-overlay.active {
+            display: flex;
+        }
+
+        .form-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-family: inherit;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-body);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .mobile-user-info {
+            display: none;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 1rem;
+                height: auto;
+                min-height: 64px;
+            }
+
+            .nav-content {
+                flex-wrap: wrap;
+            }
+
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                padding: 1rem 0;
+                gap: 0.25rem;
+                border-top: 1px solid var(--border);
+                margin-top: 0.5rem;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-link {
+                padding: 0.75rem 1rem;
+                width: 100%;
+            }
+
+            .user-menu {
+                display: none;
+                /* Hide user menu in mobile header for simplicity, or move to bottom of nav-links */
+            }
+
+            /* Show user info in nav links for mobile */
+            .mobile-user-info {
+                display: block;
+                padding: 0.75rem 1rem;
+                border-top: 1px solid var(--border);
+                margin-top: 0.5rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .main-container {
+                padding: 0 1rem;
+                margin: 1.5rem auto;
+            }
+
+            .header-widget {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+                text-align: left;
+            }
+
+            .header-widget>div {
+                text-align: left !important;
+                width: 100%;
+            }
+
+            /* Calendar Mobile */
+            .calendar-header {
+                display: none;
+                /* Hide weekday headers */
+            }
+
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-cell {
+                border-right: none;
+                min-height: auto;
+                display: flex;
+                /* Flex to show date and shifts side-by-side or stacked densely */
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .calendar-cell.empty-cell {
+                display: none;
+                /* Hide empty filler days */
+            }
+
+            .date-number::after {
+                content: attr(data-day);
+                /* Use CSS to show day name if possible, or JS */
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+                margin-left: 0.5rem;
+                font-weight: 400;
+            }
+
+            /* Table Mobile */
+            .complaint-table,
+            .complaint-table tbody,
+            .complaint-table tr,
+            .complaint-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .complaint-table thead {
+                display: none;
+            }
+
+            .complaint-table tr {
+                margin-bottom: 1rem;
+                border: 1px solid var(--border);
+                border-radius: 0.5rem;
+                padding: 0.5rem;
+            }
+
+            .complaint-table td {
+                border-bottom: none;
+                padding: 0.5rem;
+                text-align: right;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .complaint-table td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: 600;
+                color: var(--text-secondary);
+                font-size: 0.875rem;
+            }
+
+            .view-controls {
+                width: 100%;
+            }
+
+            .view-btn {
+                flex: 1;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="brand">
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="brand-icon">
+                    <i data-lucide="pizza"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>Paprika</h1>
+                    <p>Internal Dashboard</p>
+                </div>
+            </div>
+
+            <div id="nav-links" class="nav-links">
+
+                <a onclick="switchTab('payroll')" id="nav-payroll" class="nav-link">
+                    <i data-lucide="dollar-sign" size="18"></i> Salarisadministratie
+                </a>
+                <a onclick="switchTab('info')" id="nav-info" class="nav-link active">
+                    <i data-lucide="info" size="18"></i> Winkel Info
+                </a>
+                <a onclick="switchTab('complaints')" id="nav-complaints" class="nav-link">
+                    <i data-lucide="alert-circle" size="18"></i> Klachten
+                </a>
+
+                <!-- Mobile User Info -->
+                <div class="mobile-user-info">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div>
+                            <p class="user-name">Tony S.</p>
+                            <p class="user-role">Manager</p>
+                        </div>
+                        <a href="home.html" class="logout-btn" style="padding: 0;">
+                            <i data-lucide="log-out" size="18"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="user-menu">
+                <div class="user-info">
+                    <p class="user-name">Tony S.</p>
+                    <p class="user-role">Manager</p>
+                </div>
+                <a href="home.html" class="logout-btn">
+                    <i data-lucide="log-out" size="18"></i> Uitloggen
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+
+        <a href="home.html" class="back-home">
+            <i data-lucide="arrow-left" size="16"></i> Terug naar Paprika Home
+        </a>
+
+        <!-- Header Widget (Always Visible) -->
+        <div class="header-widget">
+            <div>
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Welkom terug, Tony 👋</h2>
+                <p style="color: var(--text-secondary); margin-top: 0.25rem;">Er zijn 3 open diensten deze week.</p>
+            </div>
+            <div style="text-align: right;">
+                <p style="font-size: 0.875rem; color: var(--text-secondary);">Huidige Loorkosten</p>
+                <p style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">€ 1.250,50</p>
+            </div>
+        </div>
+
+
+
+        <!-- SECTION: PAYROLL -->
+        <div id="view-payroll" class="view-section">
+            <h2 class="page-title">Salarisoverzicht</h2>
+            <p class="text-secondary mb-6">Overzicht voor Februari 2026</p>
+
+            <div class="payroll-summary">
+                <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Totale Loonkosten (Deze Maand)
+                </h4>
+                <p style="font-size: 2.25rem; font-weight: 700;">€ 4.250,00</p>
+                <p style="font-size: 0.875rem; opacity: 0.9; margin-top: 0.5rem;">Binnen budget (+€ 750,00 over)</p>
+            </div>
+
+            <div class="payroll-card">
+                <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem;">Medewerkers Details</h3>
+
+                <div id="payroll-list">
+                    <!-- Populated by JS -->
+                    <div class="payroll-row">
+                        <div>
+                            <p style="font-weight: 600;">Tony Stark</p>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary);">Manager • 38u @ €25/u</p>
+                        </div>
+                        <div style="font-weight: 700; color: var(--primary);">€ 950,00</div>
+                    </div>
+                    <div class="payroll-row">
+                        <div>
+                            <p style="font-weight: 600;">Sarah Jansen</p>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary);">Keuken • 24u @ €14/u</p>
+                        </div>
+                        <div style="font-weight: 700; color: var(--primary);">€ 336,00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: STORE INFO -->
+        <div id="view-info" class="view-section active">
+            <div class="dashboard-header">
+                <h2 class="page-title">Winkel Info & Mededelingen</h2>
+                <button class="btn btn-primary">
+                    <i data-lucide="plus" size="18"></i> Nieuw Bericht
+                </button>
+            </div>
+
+            <div class="announcement-card priority-urgent">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                    <h3 style="font-weight: 700; font-size: 1.125rem; color: #991b1b;">⚠️ Inspectie Morgen!</h3>
+                    <span class="badge" style="background: #fee2e2; color: #991b1b;">Urgent</span>
+                </div>
+                <p style="font-size: 0.875rem; color: #7f1d1d;">Zorg ervoor dat alles vanavond perfect schoon is. De
+                    inspecteur komt rond 10:00 uur.</p>
+                <div style="margin-top: 0.75rem; font-size: 0.75rem; color: #991b1b; display: flex; gap: 1rem;">
+                    <span><i data-lucide="user" size="12"></i> Tony</span>
+                    <span><i data-lucide="clock" size="12"></i> 2 uur geleden</span>
+                </div>
+            </div>
+
+            <div class="announcement-card">
+                <h3 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem;">Nieuwe Menukaart</h3>
+                <p style="font-size: 0.875rem; color: var(--text-secondary);">Vanaf volgende week gaan we over op de
+                    lente-menukaart. Bekijk de nieuwe recepten in de map.</p>
+                <div
+                    style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-secondary); display: flex; gap: 1rem;">
+                    <span><i data-lucide="user" size="12"></i> Hoofdkantoor</span>
+                    <span><i data-lucide="clock" size="12"></i> Gisteren</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: COMPLAINTS -->
+        <div id="view-complaints" class="view-section">
+            <div class="dashboard-header">
+                <h2 class="page-title">Klachten & Meldingen</h2>
+                <button class="btn btn-primary" onclick="openComplaintForm()">
+                    <i data-lucide="plus-circle" size="18"></i> Nieuwe Klacht
+                </button>
+            </div>
+
+            <table class="complaint-table">
+                <thead>
+                    <tr>
+                        <th>Titel</th>
+                        <th>Categorie</th>
+                        <th>Urgentie</th>
+                        <th>Status</th>
+                        <th>Actie</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Oven 2 wordt niet warm</td>
+                        <td>Apparatuur</td>
+                        <td><span class="badge" style="background: #fee2e2; color: #991b1b;">Hoog</span></td>
+                        <td><span class="badge badge-open">Open</span></td>
+                        <td><button class="btn btn-secondary"
+                                style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Bekijk</button></td>
+                    </tr>
+                    <tr>
+                        <td>Tekort aan pizzabdozen</td>
+                        <td>Voorraad</td>
+                        <td><span class="badge" style="background: #fef3c7; color: #92400e;">Middel</span></td>
+                        <td><span class="badge badge-resolved">Opgelost</span></td>
+                        <td><button class="btn btn-secondary"
+                                style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Bekijk</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Complaint Modal -->
+    <div id="complaint-modal" class="form-overlay">
+        <div class="form-card">
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Nieuwe Klacht Indienen</h3>
+            <form onsubmit="submitComplaint(event)">
+                <div class="form-group">
+                    <label class="form-label">Titel</label>
+                    <input type="text" class="form-input" placeholder="Korte beschrijving" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Categorie</label>
+                    <select class="form-select">
+                        <option>Apparatuur</option>
+                        <option>Voorraad</option>
+                        <option>Kassa Systeem</option>
+                        <option>Overig</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Beschrijving</label>
+                    <textarea class="form-textarea" rows="4" placeholder="Details over het probleem..."
+                        required></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeComplaintForm()">Annuleren</button>
+                    <button type="submit" class="btn btn-primary">Versturen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Use Lucide icons
+        lucide.createIcons();
+
+        // View Management
+        function switchTab(viewId) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            // Remove active class from nav links
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+
+            // Show selected view
+            document.getElementById('view-' + viewId).classList.add('active');
+
+            // Activate nav link
+            // Note: In a real app we might pass the element, but ID lookup is fine
+            const navMap = {
+                'payroll': 'nav-payroll',
+                'info': 'nav-info',
+                'complaints': 'nav-complaints'
+            };
+            document.getElementById(navMap[viewId]).classList.add('active');
+        }
+
+        // Complaint Form
+        function openComplaintForm() {
+            document.getElementById('complaint-modal').classList.add('active');
+        }
+
+        function closeComplaintForm() {
+            document.getElementById('complaint-modal').classList.remove('active');
+        }
+
+        function submitComplaint(e) {
+            e.preventDefault();
+            // Simulate API call
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerText = "Versturen...";
+
+            setTimeout(() => {
+                alert("Klacht succesvol ingediend!");
+                closeComplaintForm();
+                btn.innerText = originalText;
+                e.target.reset();
+            }, 800);
+        }
+
+        // Mobile Menu
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('nav-links');
+            navLinks.classList.toggle('active');
+        }
+
+        // Enhance Mobile Layout (Add data attributes dynamically)
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Calendar Days - Removed
+            // const days = ['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'];
+            // document.querySelectorAll('.calendar-cell').forEach((cell, index) => {
+            //     const dateNum = cell.querySelector('.date-number');
+            //     if (dateNum) {
+            //         const dayIndex = index % 7;
+            //         dateNum.setAttribute('data-day', days[dayIndex]);
+            //     }
+            // });
+
+            // 2. Table Labels
+            const table = document.querySelector('.complaint-table');
+            if (table) {
+                const headers = Array.from(table.querySelectorAll('th')).map(th => th.innerText);
+                table.querySelectorAll('tbody tr').forEach(tr => {
+                    tr.querySelectorAll('td').forEach((td, index) => {
+                        if (headers[index]) {
+                            td.setAttribute('data-label', headers[index]);
+                        }
+                    });
+                });
+            }
+        });
+
+        // Initialize
+        console.log("Paprika Dashboard Loaded - Fully Functional & Mobile Optimized");
+    </script>
+</body>
+
+</html>

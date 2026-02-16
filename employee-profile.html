@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Profile - Paprika Workforce</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="workforce-styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-header">
+                <img src="paprika-logo.png" alt="Paprika">
+                <div>
+                    <h1>Workforce Management</h1>
+                    <div class="header-subtitle">Employee Profile</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a href="home.html" class="btn btn-secondary">🏠 Home</a>
+                <a href="time-clock.html" class="btn btn-secondary">Time Clock</a>
+                <a href="manager-approval.html" class="btn btn-secondary">Manager View</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Employee Selector (Demo) -->
+        <div class="card mb-lg">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Select Employee (Demo)</label>
+                <select id="employeeSelector" class="form-input">
+                    <option value="">Choose an employee...</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="profileContent" class="hidden">
+            <!-- Employee Header -->
+            <div class="card mb-lg">
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <div
+                        style="width: 80px; height: 80px; background: linear-gradient(135deg, #E31E24, #C41E3A); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700;">
+                        <span id="employeeInitials">--</span>
+                    </div>
+                    <div style="flex: 1;">
+                        <h2 id="profileName" style="font-size: 1.875rem; font-weight: 700; margin-bottom: 0.25rem;">--
+                        </h2>
+                        <p id="profileRole" style="color: var(--gray-500); font-size: 1.125rem;">--</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hours Summary -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Hours This Week</div>
+                    <div class="stat-value">
+                        <span id="weeklyHours">0</span>
+                        <span class="stat-unit">hrs</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Hours (3 Months)</div>
+                    <div class="stat-value">
+                        <span id="totalHours">0</span>
+                        <span class="stat-unit">hrs</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pending Approval</div>
+                    <div class="stat-value">
+                        <span id="pendingShifts">0</span>
+                        <span class="stat-unit">shifts</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Shifts -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Shifts</h3>
+                    <p class="card-subtitle">Your shift history and approval status</p>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Clock In</th>
+                                <th>Clock Out</th>
+                                <th>Total Hours</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shiftsTable">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--gray-500);">No shifts found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="workforce-data.js"></script>
+    <script>
+        // Populate employee selector
+        const selector = document.getElementById('employeeSelector');
+        WORKFORCE_DATA.employees.forEach(emp => {
+            const option = document.createElement('option');
+            option.value = emp.id;
+            option.textContent = `${emp.name} - ${emp.role}`;
+            selector.appendChild(option);
+        });
+
+        // Load profile when employee selected
+        selector.addEventListener('change', (e) => {
+            const employeeId = parseInt(e.target.value);
+            if (employeeId) {
+                loadProfile(employeeId);
+            } else {
+                document.getElementById('profileContent').classList.add('hidden');
+            }
+        });
+
+        function loadProfile(employeeId) {
+            const employee = WORKFORCE_DATA.employees.find(e => e.id === employeeId);
+            if (!employee) return;
+
+            // Show profile content
+            document.getElementById('profileContent').classList.remove('hidden');
+
+            // Employee header
+            const initials = employee.name.split(' ').map(n => n[0]).join('');
+            document.getElementById('employeeInitials').textContent = initials;
+            document.getElementById('profileName').textContent = employee.name;
+            document.getElementById('profileRole').textContent = `${employee.role} • ${employee.location}`;
+
+            // Calculate hours
+            const weeklyHours = WORKFORCE_DATA.getWeeklyHours(employeeId);
+            const totalHours = WORKFORCE_DATA.getThreeMonthHours(employeeId);
+            const pendingShifts = WORKFORCE_DATA.shiftHistory.filter(
+                s => s.employeeId === employeeId && !s.approved
+            ).length;
+
+            document.getElementById('weeklyHours').textContent = weeklyHours.toFixed(1);
+            document.getElementById('totalHours').textContent = totalHours.toFixed(1);
+            document.getElementById('pendingShifts').textContent = pendingShifts;
+
+            // Load recent shifts
+            loadShifts(employeeId);
+        }
+
+        function loadShifts(employeeId) {
+            const shifts = WORKFORCE_DATA.getRecentShifts(employeeId, 15);
+            const tbody = document.getElementById('shiftsTable');
+
+            if (shifts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--gray-500);">No shifts found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = shifts.map(shift => {
+                const date = new Date(shift.date);
+                const dateStr = date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                const statusBadge = shift.approved
+                    ? '<span class="badge badge-success">✓ Approved</span>'
+                    : '<span class="badge badge-warning">⏳ Pending</span>';
+
+                return `
+          <tr>
+            <td><strong>${dateStr}</strong></td>
+            <td>${shift.clockIn}</td>
+            <td>${shift.clockOut || '<span style="color: var(--status-error);">Missing</span>'}</td>
+            <td><strong>${shift.totalHours ? shift.totalHours.toFixed(1) + ' hrs' : '--'}</strong></td>
+            <td>${statusBadge}</td>
+          </tr>
+        `;
+            }).join('');
+        }
+
+        // Auto-load first employee for demo
+        setTimeout(() => {
+            selector.value = '1';
+            selector.dispatchEvent(new Event('change'));
+        }, 100);
+    </script>
+</body>
+
+</html>

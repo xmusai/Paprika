@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Approval - Paprika Workforce</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="workforce-styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-header">
+                <img src="paprika-logo.png" alt="Paprika">
+                <div>
+                    <h1>Workforce Management</h1>
+                    <div class="header-subtitle">Manager Approval Dashboard</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a href="home.html" class="btn btn-secondary">🏠 Home</a>
+                <a href="time-clock.html" class="btn btn-secondary">Time Clock</a>
+                <a href="employee-profile.html" class="btn btn-secondary">Employee Profile</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Date Header -->
+        <div class="card mb-lg">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">Today's Shifts</h2>
+                    <p style="color: var(--gray-500);" id="todayDate">Wednesday, February 12, 2026</p>
+                </div>
+                <div id="dayStatus" class="badge badge-warning" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                    ⏳ Day Open
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Employees</div>
+                <div class="stat-value">
+                    <span id="totalEmployees">0</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Hours</div>
+                <div class="stat-value">
+                    <span id="totalHours">0</span>
+                    <span class="stat-unit">hrs</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pending Approval</div>
+                <div class="stat-value">
+                    <span id="pendingCount">0</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Anomalies</div>
+                <div class="stat-value">
+                    <span id="anomalyCount" style="color: var(--status-error);">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Shifts Table -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Employee Shifts</h3>
+                <p class="card-subtitle">Review and approve today's worked hours</p>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Clock In</th>
+                            <th>Clock Out</th>
+                            <th>Total Hours</th>
+                            <th>Flags</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shiftsTable">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: var(--gray-500);">Loading shifts...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div
+                style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 1rem;">
+                <button id="approveAllBtn" class="btn btn-success btn-lg">
+                    ✓ Approve All & Close Day
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">⚠️ Close Day Confirmation</h3>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 1rem;">You are about to approve all shifts and close the day. This action will:
+                </p>
+                <ul style="margin-left: 1.5rem; color: var(--gray-600); line-height: 1.8;">
+                    <li>Approve all pending shifts</li>
+                    <li>Lock today's records (no further edits)</li>
+                    <li>Finalize the workforce record for February 12, 2026</li>
+                </ul>
+                <p
+                    style="margin-top: 1rem; padding: 1rem; background: var(--status-warning-light); color: var(--status-warning); border-radius: var(--radius-md); font-weight: 600;">
+                    ⚠️ Note: There are <span id="modalAnomalyCount">0</span> shifts with anomalies. Please review before
+                    proceeding.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelBtn" class="btn btn-secondary">Cancel</button>
+                <button id="confirmBtn" class="btn btn-success">Confirm & Close Day</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="workforce-data.js"></script>
+    <script>
+        let dayClosed = false;
+
+        // Load today's shifts
+        function loadShifts() {
+            const shifts = WORKFORCE_DATA.todayShifts;
+            const tbody = document.getElementById('shiftsTable');
+
+            if (shifts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--gray-500);">No shifts for today</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = shifts.map(shift => {
+                const employee = WORKFORCE_DATA.employees.find(e => e.id === shift.employeeId);
+
+                // Generate flags
+                let flagsHTML = '';
+                if (shift.flags.includes('overtime')) {
+                    flagsHTML += '<span class="badge badge-warning" style="margin-right: 0.25rem;">⚠️ Overtime</span>';
+                }
+                if (shift.flags.includes('missing-clockout')) {
+                    flagsHTML += '<span class="badge badge-error" style="margin-right: 0.25rem;">🔴 Missing Clock-Out</span>';
+                }
+                if (shift.flags.includes('short-shift')) {
+                    flagsHTML += '<span class="badge badge-info" style="margin-right: 0.25rem;">⏱️ Short Shift</span>';
+                }
+                if (shift.flags.length === 0) {
+                    flagsHTML = '<span style="color: var(--gray-400);">—</span>';
+                }
+
+                // Status badge
+                const statusBadge = shift.approved
+                    ? '<span class="badge badge-success">✓ Approved</span>'
+                    : '<span class="badge badge-gray">⏳ Pending</span>';
+
+                // Action button
+                const actionBtn = shift.approved || dayClosed
+                    ? '<button class="btn btn-secondary" disabled style="font-size: 0.875rem; padding: 0.5rem 1rem;">Approved</button>'
+                    : `<button class="btn btn-success" onclick="approveShift('${shift.id}')" style="font-size: 0.875rem; padding: 0.5rem 1rem;">✓ Approve</button>`;
+
+                return `
+          <tr id="shift-${shift.id}">
+            <td>
+              <strong>${shift.employeeName}</strong><br>
+              <span style="font-size: 0.75rem; color: var(--gray-500);">${employee.role}</span>
+            </td>
+            <td><strong>${shift.clockIn}</strong></td>
+            <td><strong>${shift.clockOut || '<span style="color: var(--status-error);">Missing</span>'}</strong></td>
+            <td><strong>${shift.totalHours ? shift.totalHours.toFixed(1) + ' hrs' : '—'}</strong></td>
+            <td>${flagsHTML}</td>
+            <td id="status-${shift.id}">${statusBadge}</td>
+            <td id="action-${shift.id}">${actionBtn}</td>
+          </tr>
+        `;
+            }).join('');
+
+            updateStats();
+        }
+
+        // Update summary stats
+        function updateStats() {
+            const shifts = WORKFORCE_DATA.todayShifts;
+
+            const totalEmployees = shifts.length;
+            const totalHours = shifts.reduce((sum, s) => sum + (s.totalHours || 0), 0);
+            const pendingCount = shifts.filter(s => !s.approved).length;
+            const anomalyCount = shifts.filter(s => s.flags.length > 0).length;
+
+            document.getElementById('totalEmployees').textContent = totalEmployees;
+            document.getElementById('totalHours').textContent = totalHours.toFixed(1);
+            document.getElementById('pendingCount').textContent = pendingCount;
+            document.getElementById('anomalyCount').textContent = anomalyCount;
+            document.getElementById('modalAnomalyCount').textContent = anomalyCount;
+
+            // Disable approve all if all approved or day closed
+            const approveAllBtn = document.getElementById('approveAllBtn');
+            if (pendingCount === 0 || dayClosed) {
+                approveAllBtn.disabled = true;
+                approveAllBtn.textContent = dayClosed ? '✓ Day Closed' : '✓ All Approved';
+            }
+        }
+
+        // Approve individual shift
+        window.approveShift = function (shiftId) {
+            const shift = WORKFORCE_DATA.todayShifts.find(s => s.id === shiftId);
+            if (!shift || shift.approved) return;
+
+            shift.approved = true;
+            shift.approvedBy = 'Manager';
+            shift.approvedAt = new Date().toISOString();
+
+            // Update UI
+            document.getElementById(`status-${shiftId}`).innerHTML = '<span class="badge badge-success">✓ Approved</span>';
+            document.getElementById(`action-${shiftId}`).innerHTML = '<button class="btn btn-secondary" disabled style="font-size: 0.875rem; padding: 0.5rem 1rem;">Approved</button>';
+
+            showAlert(`✓ Shift approved for ${shift.employeeName}`, 'success');
+            updateStats();
+        };
+
+        // Approve all and close day
+        document.getElementById('approveAllBtn').addEventListener('click', () => {
+            document.getElementById('confirmModal').classList.add('active');
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            document.getElementById('confirmModal').classList.remove('active');
+        });
+
+        document.getElementById('confirmBtn').addEventListener('click', () => {
+            // Approve all pending shifts
+            WORKFORCE_DATA.todayShifts.forEach(shift => {
+                if (!shift.approved) {
+                    shift.approved = true;
+                    shift.approvedBy = 'Manager';
+                    shift.approvedAt = new Date().toISOString();
+                }
+            });
+
+            // Close the day
+            dayClosed = true;
+
+            // Update UI
+            document.getElementById('dayStatus').className = 'badge badge-success';
+            document.getElementById('dayStatus').innerHTML = '✓ Day Closed';
+
+            document.getElementById('confirmModal').classList.remove('active');
+
+            showAlert('✓ Day successfully closed. All shifts have been approved and locked.', 'success');
+
+            loadShifts(); // Reload to show all as approved
+        });
+
+        // Alert system
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+        <span style="font-size: 1.25rem;">${type === 'success' ? '✓' : '⚠'}</span>
+        <span>${message}</span>
+      `;
+
+            container.innerHTML = '';
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        }
+
+        // Initialize
+        loadShifts();
+    </script>
+</body>
+
+</html>

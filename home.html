@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paprika Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #FAFAFA;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: #1F2937;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 2rem;
+            border: 1px solid #F3F4F6;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        h1 {
+            color: #111827;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: #6B7280;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.75rem;
+            border: 1px solid #F3F4F6;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .module-card:hover {
+            border-color: #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .module-icon {
+            width: 48px;
+            height: 48px;
+            background: #FEF2F2;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .module-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .module-description {
+            color: #6B7280;
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+        }
+
+        .module-features {
+            list-style: none;
+            margin-bottom: 1.25rem;
+        }
+
+        .module-features li {
+            color: #6B7280;
+            font-size: 0.8125rem;
+            padding: 0.375rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .module-features li::before {
+            content: "•";
+            color: #E31E24;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .module-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            color: #E31E24;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            text-decoration: none;
+            transition: gap 0.2s;
+        }
+
+        .module-link:hover {
+            gap: 0.625rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #9CA3AF;
+            font-size: 0.8125rem;
+        }
+
+        @media (max-width: 768px) {
+            .modules {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <img src="paprika-logo.png" alt="Paprika">
+            </div>
+            <h1>Paprika Management System</h1>
+            <p class="subtitle">Choose a module to get started</p>
+        </div>
+
+        <div class="modules">
+            <!-- Checklist Engine Module -->
+            <a href="index.html" class="module-card">
+                <div class="module-icon">📋</div>
+                <h2 class="module-title">Checklist Engine</h2>
+                <p class="module-description">
+                    Daily task management for workers and managers across all locations.
+                </p>
+                <ul class="module-features">
+                    <li>Worker daily checklists</li>
+                    <li>Manager compliance dashboard</li>
+                    <li>Oil change rotation tracker</li>
+                    <li>Event scheduler</li>
+                    <li>Smart notifications</li>
+                </ul>
+                <span class="module-link">Open Checklist Engine →</span>
+            </a>
+
+            <!-- Workforce Management Module -->
+            <a href="time-clock.html" class="module-card">
+                <div class="module-icon">🕐</div>
+                <h2 class="module-title">Workforce Management</h2>
+                <p class="module-description">
+                    Employee time tracking and manager approval system for daily hours.
+                </p>
+                <ul class="module-features">
+                    <li>PIN-based time clock</li>
+                    <li>Employee shift history</li>
+                    <li>Manager approval dashboard</li>
+                    <li>Anomaly detection</li>
+                    <li>Historical data tracking</li>
+                </ul>
+                <span class="module-link">Open Workforce Management →</span>
+            </a>
+
+            <!-- Paprika Module -->
+            <a href="paprika-dashboard.html" class="module-card">
+                <div class="module-icon">🌶️</div>
+                <h2 class="module-title">Paprika</h2>
+                <p class="module-description">
+                    Internal personnel and schedule management.
+                </p>
+                <ul class="module-features">
+                    <li>Schedule management</li>
+                    <li>Payroll administration</li>
+                    <li>Store information</li>
+                    <li>Complaints handling</li>
+                    <li>Employee earnings</li>
+                </ul>
+                <span class="module-link">Open Paprika →</span>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>Built for Paprikafood Belgrade</p>
+        </div>
+    </div>
+</body>
+
+</html>

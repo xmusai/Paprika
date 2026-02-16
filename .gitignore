@@ -1,0 +1,28 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor locks
+.~lock.*
+
+# Environment / secrets
+.env
+.env.*
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# IDE
+.vscode/
+.idea/
+*.sw?
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Vite temp files
+*.timestamp-*
